@@ -1,0 +1,7 @@
+1) Download Anaconda and MySQL(create a database avoid naming using special characters)
+2) set up the directory
+3) create a condo env: conda create --name 'name_of_the_env' python=3.10
+4) install the requirements in the activated conda env
+(pip install streamlit langchain langchain-openai langchain-groq mysql-connector-python python-dotenv)
+5) Code app.py 
+6) Run the app (streamlit run src/app.py)
