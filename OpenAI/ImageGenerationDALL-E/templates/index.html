@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>OpenAI Image Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 40px;
+            text-align: center;
+        }
+        input[type="text"] {
+            width: 300px;
+            padding: 10px;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px 15px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .image-container {
+            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+        }
+        .image-container img {
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+    <h1>Generate Images with OpenAI</h1>
+    <input type="text" id="promptInput" placeholder="Enter your prompt here">
+    <button onclick="generateImages()">Generate</button>
+
+    <div class="image-container" id="imageContainer"></div>
+
+    <script>
+        function generateImages() {
+            const prompt = document.getElementById("promptInput").value;
+            if (!prompt) {
+                alert("Please enter a prompt.");
+                return;
+            }
+
+            const container = document.getElementById("imageContainer");
+            container.innerHTML = "Generating image...";
+
+            fetch('/generateimages', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ prompt: prompt })
+            })
+            .then(res => res.json())
+            .then(data => {
+                container.innerHTML = "";
+                if (data.data && data.data.length > 0) {
+                    const img = document.createElement("img");
+                    img.src = data.data[0].url;
+                    img.width = 256;
+                    img.height = 256;
+                    container.appendChild(img);
+                } else if (data.error) {
+                    container.innerText = "Error: " + data.error;
+                } else {
+                    container.innerText = "No image returned.";
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                container.innerText = "An error occurred while generating the image.";
+            });
+        }
+
+    </script>
+</body>
+</html>
