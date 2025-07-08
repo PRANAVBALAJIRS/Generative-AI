@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>GitRepo AI Assistant</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code&family=Space+Grotesk:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="background"></div>
+
+  <div class="container">
+    <div class="card">
+      <h2>🧠 GitRepo AI Assistant</h2>
+      <p class="subhead">Ask anything about your GitHub repository using AI.</p>
+
+      <form id="repo-form" method="post">
+        <input type="text" id="repo-input" name="question" placeholder="Paste GitHub repo link..." required>
+        <button type="submit" id="repo-btn">Ingest Repo</button>
+      </form>
+
+      <div class="chat-box" id="chat-box">
+        <!-- Chat messages will be appended here -->
+      </div>
+
+      <form id="chat-form" method="post">
+        <div class="chat-input">
+          <input type="text" name="msg" id="msg" placeholder="Ask a question about the repo..." required>
+          <button type="submit">Send</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const repoForm = document.getElementById('repo-form');
+    const chatForm = document.getElementById('chat-form');
+    const chatBox = document.getElementById('chat-box');
+    const msgInput = document.getElementById('msg');
+
+    repoForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const repoLink = document.getElementById('repo-input').value;
+
+      chatBox.innerHTML += `<div class="bot-msg loading">🔄 Ingesting repository...</div>`;
+      const res = await fetch("/chatbot", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({ question: repoLink })
+      });
+
+      const data = await res.json();
+      document.querySelector(".loading").remove();
+      chatBox.innerHTML += `<div class="bot-msg">✅ Repository Ingested</div>`;
+    });
+
+    chatForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const userMsg = msgInput.value;
+
+      chatBox.innerHTML += `<div class="user-msg"><strong>You:</strong> ${userMsg}</div>`;
+      chatBox.scrollTop = chatBox.scrollHeight;
+
+      msgInput.value = "";
+      chatBox.innerHTML += `<div class="bot-msg typing">🤖 MedBot is typing...</div>`;
+
+      const response = await fetch("/get", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({ "msg": userMsg })
+      });
+
+      const botMsg = await response.text();
+      document.querySelector(".typing").remove();
+
+      chatBox.innerHTML += `<div class="bot-msg"><strong>AI:</strong> ${botMsg}</div>`;
+      chatBox.scrollTop = chatBox.scrollHeight;
+    });
+  </script>
+</body>
+</html>
