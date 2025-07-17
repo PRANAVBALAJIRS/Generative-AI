@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Gemini Chatbot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f2f5;
+            padding: 20px;
+        }
+
+        .chat-container {
+            max-width: 600px;
+            margin: auto;
+            background: #ffffff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .chat-box {
+            height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 15px;
+            background-color: #fafafa;
+        }
+
+        .message {
+            margin-bottom: 10px;
+        }
+
+        .user {
+            color: blue;
+            font-weight: bold;
+        }
+
+        .bot {
+            color: green;
+            font-weight: bold;
+        }
+
+        .input-box {
+            display: flex;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 10px;
+            font-size: 16px;
+        }
+
+        button {
+            padding: 10px 15px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            margin-left: 10px;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <h2>Gemini Chatbot</h2>
+        <div class="chat-box" id="chat-box"></div>
+        <div class="input-box">
+            <input type="text" id="user_input" placeholder="Type your message...">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <script>
+        async function sendMessage() {
+            const inputField = document.getElementById("user_input");
+            const chatBox = document.getElementById("chat-box");
+            const userText = inputField.value;
+
+            if (!userText.trim()) return;
+
+            chatBox.innerHTML += `<div class="message user">You: ${userText}</div>`;
+            inputField.value = "";
+
+            const response = await fetch(`/gemini?user_input=${encodeURIComponent(userText)}`);
+            const data = await response.json();
+            
+            chatBox.innerHTML += `<div class="message bot">Gemini: ${data.content}</div>`;
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+    </script>
+</body>
+</html>
